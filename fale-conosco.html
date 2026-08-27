@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fale Conosco | TechStore</title>
+    <meta name="description" content="Fale com a TechStore - dúvidas, pedidos, entrega e suporte.">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- HEADER (reutilizado de index.html) -->
+    <header class="header" id="header">
+        <div class="container header__content">
+            <a href="index.html" class="logo">Tech<span>Store</span></a>
+            <nav class="nav" id="nav">
+                <ul class="nav__list">
+                    <li><a href="index.html" class="nav__link">Início</a></li>
+                    <li><a href="produtos.html" class="nav__link">Produtos</a></li>
+                    <li><a href="produtos.html?categoria=Smartphones" class="nav__link">Smartphones</a></li>
+                    <li><a href="produtos.html?categoria=Notebooks" class="nav__link">Notebooks</a></li>
+                    <li><a href="fale-conosco.html" class="nav__link active">Fale Conosco</a></li>
+                </ul>
+            </nav>
+            <div class="header__actions">
+                <div class="search">
+                    <input type="search" id="search-input" class="search__input" placeholder="Buscar produto..." autocomplete="off" aria-label="Buscar produto">
+                    <button class="search__btn" id="search-btn" aria-label="Buscar">&#128269;</button>
+                </div>
+                <div id="auth-area" class="auth-area" aria-live="polite">
+                    <a href="login.html" class="auth-link">Entrar</a>
+                    <a href="cadastro.html" class="btn btn--primary btn--sm" style="padding:8px 14px; font-size:.85rem; border-radius:999px">Criar conta</a>
+                </div>
+                <button class="icon-btn" id="dark-mode-btn" aria-label="Alternar tema">&#9790;</button>
+                <a href="carrinho.html" class="cart-icon" aria-label="Carrinho">
+                    &#128722;
+                    <span class="cart-count" id="cart-count">0</span>
+                </a>
+                <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container section">
+        <div style="max-width:900px; margin:0 auto">
+            <div style="text-align:center; margin-bottom:28px">
+                <h1 class="section__title" style="font-size:1.9rem">Fale Conosco</h1>
+                <p style="color:var(--text-muted); margin-top:8px; font-size:1rem">Estamos aqui para ajudar. Envie sua dúvida e nossa equipe entrará em contato.</p>
+            </div>
+
+            <div class="fale-grid">
+                <!-- Formulário -->
+                <div class="card" style="padding:22px; border-radius:16px">
+                    <div id="fale-feedback" class="auth-feedback" role="alert" aria-live="polite" style="display:none"></div>
+                    <form id="fale-form" class="auth-form" novalidate>
+                        <div class="field">
+                            <label for="fale-nome" class="field-label">Nome *</label>
+                            <div class="input-wrap">
+                                <input type="text" id="fale-nome" class="input" placeholder="Seu nome completo" autocomplete="name" required style="padding-left:14px">
+                            </div>
+                            <span class="field-error" id="erro-fale-nome"></span>
+                        </div>
+                        <div class="field">
+                            <label for="fale-email" class="field-label">E-mail *</label>
+                            <div class="input-wrap">
+                                <input type="email" id="fale-email" class="input" placeholder="voce@exemplo.com" autocomplete="email" required style="padding-left:14px">
+                            </div>
+                            <span class="field-error" id="erro-fale-email"></span>
+                        </div>
+                        <div class="field">
+                            <label for="fale-assunto" class="field-label">Assunto *</label>
+                            <div class="input-wrap">
+                                <input type="text" id="fale-assunto" class="input" placeholder="Ex: Dúvida sobre entrega" required style="padding-left:14px">
+                            </div>
+                            <span class="field-error" id="erro-fale-assunto"></span>
+                        </div>
+                        <div class="field">
+                            <label for="fale-categoria" class="field-label">Categoria *</label>
+                            <div class="input-wrap">
+                                <select id="fale-categoria" class="input" required style="padding-left:14px; cursor:pointer">
+                                    <option value="">Selecione uma categoria</option>
+                                    <option>Dúvida sobre produto</option>
+                                    <option>Pedido</option>
+                                    <option>Entrega</option>
+                                    <option>Pagamento</option>
+                                    <option>Troca ou devolução</option>
+                                    <option>Problema no site</option>
+                                    <option>Outro</option>
+                                </select>
+                            </div>
+                            <span class="field-error" id="erro-fale-categoria"></span>
+                        </div>
+                        <div class="field">
+                            <label for="fale-mensagem" class="field-label">Mensagem *</label>
+                            <div class="input-wrap">
+                                <textarea id="fale-mensagem" class="input" placeholder="Escreva sua mensagem..." required rows="5" style="padding:14px; min-height:120px; resize:vertical"></textarea>
+                            </div>
+                            <span class="field-error" id="erro-fale-mensagem"></span>
+                            <span style="font-size:.78rem; color:var(--text-muted); text-align:right" id="fale-contador">0 / 20 mínimo</span>
+                        </div>
+                        <button type="submit" class="btn btn--primary auth-btn" id="fale-enviar" style="border-radius:12px; padding:13px 18px; margin-top:4px">
+                            <span class="btn-text">Enviar mensagem</span>
+                        </button>
+                    </form>
+                    <div id="fale-sucesso" class="demo-box" style="display:none; margin-top:16px">
+                        <div class="demo-box-header">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            Mensagem enviada com sucesso!
+                        </div>
+                        <p class="demo-text">Protocolo: <strong id="fale-protocolo"></strong></p>
+                        <p class="demo-text" style="font-size:.82rem">Esta é uma demonstração frontend. Mensagem salva em <code>localStorage</code> para futura integração com backend.</p>
+                    </div>
+                </div>
+
+                <!-- Lateral contato -->
+                <div class="card" style="padding:22px; border-radius:16px; background: linear-gradient(180deg, var(--surface) 0%, #f8fafc 100%); height:fit-content">
+                    <h3 style="font-weight:800; margin-bottom:12px; font-size:1.05rem">Atendimento</h3>
+                    <div style="display:grid; gap:14px; font-size:.92rem; line-height:1.5">
+                        <div style="display:flex; gap:10px; align-items:flex-start">
+                            <span style="font-size:1.2rem">📧</span>
+                            <div>
+                                <strong>E-mail</strong><br>
+                                <a href="mailto:contato@techstore.com.br" class="link" style="font-size:.92rem">contato@techstore.com.br</a>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px; align-items:flex-start">
+                            <span style="font-size:1.2rem">📱</span>
+                            <div>
+                                <strong>WhatsApp</strong><br>
+                                <a href="https://wa.me/5521999990000" target="_blank" rel="noopener" class="link" style="font-size:.92rem">(21) 99999-0000</a>
+                                <span style="color:var(--text-muted); font-size:.80rem; display:block">(demonstrativo)</span>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px; align-items:flex-start">
+                            <span style="font-size:1.2rem">🕒</span>
+                            <div>
+                                <strong>Horário</strong><br>
+                                <span style="color:var(--text-muted)">Segunda a sexta, 9h às 18h</span>
+                            </div>
+                        </div>
+                        <div style="margin-top:8px; padding:12px; background:var(--background); border:1px solid var(--border); border-radius:10px; font-size:.82rem; color:var(--text-muted)">
+                            Valores demonstrativos — fácil alterar em <code>fale-conosco.html</code> ou futuro <code>localStorage techstore_config</code>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- RODAPÉ (reutilizado) -->
+    <footer class="footer">
+        <div class="container footer__content">
+            <div class="footer__col">
+                <a href="index.html" class="logo logo--footer">Tech<span>Store</span></a>
+                <p>Sua loja de confiança em eletrônicos desde 2026. Qualidade, preço justo e entrega rápida.</p>
+            </div>
+            <div class="footer__col">
+                <h4>Categorias</h4>
+                <ul>
+                    <li><a href="produtos.html?categoria=Smartphones">Smartphones</a></li>
+                    <li><a href="produtos.html?categoria=Notebooks">Notebooks</a></li>
+                    <li><a href="produtos.html?categoria=Placas de vídeo">Placas de vídeo</a></li>
+                    <li><a href="produtos.html?categoria=Monitores">Monitores</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <h4>Ajuda</h4>
+                <ul>
+                    <li><a href="#">Frete e entrega</a></li>
+                    <li><a href="#">Trocas e devoluções</a></li>
+                    <li><a href="#">Formas de pagamento</a></li>
+                    <li><a href="fale-conosco.html">Fale conosco</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <h4>Contato</h4>
+                <p>contato@techstore.com.br<br>(11) 99999-0000<br>Seg a Sex 9h às 18h</p>
+            </div>
+        </div>
+        <div class="footer__bottom">
+            <div class="container">
+                <p>&copy; 2026 TechStore. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+    <style>
+        /* Layout Fale Conosco - reutiliza variáveis TechStore, sem novo CSS externo */
+        .fale-grid { display:grid; grid-template-columns:1.35fr 0.75fr; gap:20px; align-items:start; }
+        @media (max-width: 860px) { .fale-grid { grid-template-columns:1fr; } }
+        #fale-mensagem.input { padding-left:14px; }
+        @media (max-width: 768px) {
+            #fale-form .input, #fale-form select { font-size:16px; }
+            .fale-grid { gap:16px; }
+        }
+    </style>
+    <script src="js/produtos.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/cep.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+    // Fale Conosco - validação e localStorage (frontend demo, sem backend)
+    // Estrutura preparada para futura API: fetch('/api/contato', {method:'POST', body: JSON.stringify(msg)})
+    (function(){
+        const STORAGE_KEY = 'techstore_mensagens';
+        const COUNTER_KEY = 'techstore_mensagens_seq';
+        const form = document.getElementById('fale-form');
+        const feedback = document.getElementById('fale-feedback');
+        const sucesso = document.getElementById('fale-sucesso');
+        const protocoloEl = document.getElementById('fale-protocolo');
+        const contador = document.getElementById('fale-contador');
+        const msgEl = document.getElementById('fale-mensagem');
+        if (!form) return;
+
+        function showFieldError(id, msg){
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = msg || '';
+            el.classList.toggle('show', !!msg);
+            const inputId = id.replace('erro-fale-','fale-');
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.classList.toggle('input--error', !!msg);
+                if (msg) input.setAttribute('aria-invalid','true'); else input.removeAttribute('aria-invalid');
+            }
+        }
+        function clearErrors(){
+            ['erro-fale-nome','erro-fale-email','erro-fale-assunto','erro-fale-categoria','erro-fale-mensagem'].forEach(id=> showFieldError(id,''));
+            if (feedback) { feedback.style.display='none'; feedback.textContent=''; feedback.className='auth-feedback'; }
+        }
+        function showFeedback(msg, tipo){
+            if (!feedback) return;
+            feedback.textContent = msg;
+            feedback.className = 'auth-feedback show auth-feedback--' + (tipo||'error');
+            feedback.style.display = 'flex';
+            try{ feedback.scrollIntoView({behavior:'smooth', block:'nearest'}); }catch{}
+        }
+        function gerarProtocolo(){
+            let seq = 1;
+            try{
+                const raw = localStorage.getItem(COUNTER_KEY);
+                seq = raw ? parseInt(raw,10)+1 : 1;
+                localStorage.setItem(COUNTER_KEY, String(seq));
+            }catch{}
+            return '#TS-' + String(seq).padStart(6,'0');
+        }
+        function getMensagens(){
+            try{
+                const raw = localStorage.getItem(STORAGE_KEY);
+                const arr = raw ? JSON.parse(raw) : [];
+                return Array.isArray(arr) ? arr : [];
+            }catch{ return []; }
+        }
+
+        // contador
+        if (msgEl && contador) {
+            msgEl.addEventListener('input', ()=>{
+                const len = msgEl.value.trim().length;
+                contador.textContent = len + ' / 20 mínimo';
+                contador.style.color = len >= 20 ? 'var(--success)' : 'var(--text-muted)';
+                if (len) showFieldError('erro-fale-mensagem','');
+            });
+        }
+        // limpa erro ao digitar
+        ['fale-nome','fale-email','fale-assunto','fale-categoria'].forEach(id=>{
+            const el=document.getElementById(id);
+            if(!el) return;
+            const errId='erro-'+id.replace('fale-','fale-');
+            // para categoria, erro id é erro-fale-categoria
+            el.addEventListener('input', ()=> showFieldError('erro-'+id.replace('fale-','fale-'), ''));
+            el.addEventListener('change', ()=> showFieldError('erro-'+id.replace('fale-','fale-'), ''));
+        });
+
+        form.addEventListener('submit', (e)=>{
+            e.preventDefault();
+            clearErrors();
+            if (sucesso) sucesso.style.display='none';
+
+            const nome = document.getElementById('fale-nome').value.trim();
+            const email = document.getElementById('fale-email').value.trim();
+            const assunto = document.getElementById('fale-assunto').value.trim();
+            const categoria = document.getElementById('fale-categoria').value;
+            const mensagem = document.getElementById('fale-mensagem').value.trim();
+
+            let hasError=false;
+            if(!nome){ showFieldError('erro-fale-nome','Informe seu nome.'); hasError=true; }
+            if(!email){ showFieldError('erro-fale-email','Informe seu e-mail.'); hasError=true; }
+            else if(typeof validarEmail === 'function' ? !validarEmail(email) : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+                showFieldError('erro-fale-email','E-mail inválido.'); hasError=true;
+            }
+            if(!assunto){ showFieldError('erro-fale-assunto','Informe o assunto.'); hasError=true; }
+            if(!categoria){ showFieldError('erro-fale-categoria','Selecione uma categoria.'); hasError=true; }
+            if(!mensagem){ showFieldError('erro-fale-mensagem','Escreva sua mensagem.'); hasError=true; }
+            else if(mensagem.length < 20){ showFieldError('erro-fale-mensagem','Mensagem muito curta. Mínimo 20 caracteres.'); hasError=true; }
+
+            if(hasError){
+                showFeedback('Corrija os campos destacados e tente novamente.', 'error');
+                // shake leve no card
+                const card=form.closest('.card');
+                if(card){ card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); setTimeout(()=>card.classList.remove('shake'), 500); }
+                return;
+            }
+
+            // NÃO envia e-mail real - salva local e prepara para futura API
+            // Futuro: await fetch('/api/contato', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({nome,email,assunto,categoria,mensagem})})
+            const protocolo = gerarProtocolo();
+            const nova = {
+                id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+                protocolo,
+                nome, email, assunto, categoria, mensagem,
+                data: new Date().toISOString(),
+                status: 'Nova' // Nova | Em atendimento | Respondida | Encerrada
+            };
+            const lista = getMensagens();
+            lista.push(nova);
+            try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(lista)); }catch{}
+            try{ localStorage.setItem('techstore_mensagens_last', JSON.stringify(nova)); }catch{}
+
+            // sucesso
+            if(protocoloEl) protocoloEl.textContent = protocolo;
+            if(sucesso) sucesso.style.display='grid';
+            showFeedback('Mensagem enviada com sucesso!', 'success');
+            if(typeof mostrarToast === 'function') mostrarToast('Mensagem enviada! Protocolo ' + protocolo, 'success');
+            form.reset();
+            if(contador){ contador.textContent='0 / 20 mínimo'; contador.style.color='var(--text-muted)'; }
+            // limpa estados visuais
+            form.querySelectorAll('.input').forEach(i=>{ i.classList.remove('input--error','input--success'); i.removeAttribute('aria-invalid'); });
+        });
+
+        // expõe para painel admin futuro (ETAPA 10)
+        window.TechStoreMensagens = { getMensagens, STORAGE_KEY, COUNTER_KEY };
+    })();
+    </script>
+</body>
+</html>

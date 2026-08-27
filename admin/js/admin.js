@@ -128,6 +128,14 @@ function renderDashboard() {
     if (elEstoque) elEstoque.textContent = estoqueBaixo;
     const hint = document.getElementById('dash-estoque-hint');
     if (hint) hint.textContent = semEstoque ? `${semEstoque} sem estoque • ${estoqueBaixo} baixo` : `${estoqueBaixo} com estoque 1-10`;
+    try {
+        const mensagens = getMensagens();
+        const novas = mensagens.filter(m=> m.status==='Nova').length;
+        const elMensagens = document.getElementById('dash-mensagens');
+        const hintMensagens = document.getElementById('dash-mensagens-hint');
+        if (elMensagens) elMensagens.textContent = mensagens.length;
+        if (hintMensagens) hintMensagens.textContent = novas ? novas + ' novas' : 'nenhuma nova';
+    } catch {}
     const tbody = document.getElementById('dash-pedidos-tbody');
     if (tbody) {
         tbody.innerHTML = pedidos.slice(0,5).map(p => `
@@ -441,6 +449,140 @@ function configurarPedidosAdmin() {
     renderPedidosTabela();
 }
 
+// ---------- Mensagens (Fale Conosco) ----------
+let _mensagensBusca = '';
+let _mensagensFiltroStatus = '';
+let _mensagensFiltroCategoria = '';
+let _mensagemAbertaId = null;
+const MENSAGENS_KEY = 'techstore_mensagens';
+
+function getMensagens() {
+    try {
+        if (typeof TechStoreMensagens !== 'undefined' && TechStoreMensagens.getMensagens) return TechStoreMensagens.getMensagens();
+    } catch {}
+    try {
+        const raw = localStorage.getItem(MENSAGENS_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+    } catch { return []; }
+}
+function salvarMensagens(arr) {
+    try { localStorage.setItem(MENSAGENS_KEY, JSON.stringify(arr)); } catch {}
+    try { window.dispatchEvent(new CustomEvent('mensagens:atualizado')); } catch {}
+}
+function formatarDataMensagem(iso){
+    try { const d=new Date(iso); return d.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}); } catch { return iso; }
+}
+function renderMensagensTabela(){
+    const tbody=document.getElementById('mensagens-tbody');
+    const countEl=document.getElementById('mensagens-count');
+    const novasEl=document.getElementById('mensagens-novas');
+    if(!tbody) return;
+    let lista=getMensagens();
+    lista = [...lista].sort((a,b)=> new Date(b.data) - new Date(a.data));
+    const total=lista.length;
+    const novas=lista.filter(m=> m.status==='Nova').length;
+    if(countEl) countEl.textContent=total;
+    if(novasEl) novasEl.textContent=novas + ' novas';
+    const termo=(_mensagensBusca||'').toLowerCase();
+    const filtroStatus=_mensagensFiltroStatus||'';
+    const filtroCat=_mensagensFiltroCategoria||'';
+    if(termo){
+        lista=lista.filter(m=> (m.protocolo||'').toLowerCase().includes(termo) || (m.nome||'').toLowerCase().includes(termo) || (m.email||'').toLowerCase().includes(termo) || (m.assunto||'').toLowerCase().includes(termo));
+    }
+    if(filtroStatus) lista=lista.filter(m=> m.status===filtroStatus);
+    if(filtroCat) lista=lista.filter(m=> m.categoria===filtroCat);
+    const dashMensagens=document.getElementById('dash-mensagens');
+    const dashHint=document.getElementById('dash-mensagens-hint');
+    if(dashMensagens) dashMensagens.textContent=total;
+    if(dashHint) dashHint.textContent= novas ? novas + ' novas' : 'nenhuma nova';
+    if(lista.length===0){
+        tbody.innerHTML=`<tr><td colspan="8" style="text-align:center; padding:32px; color:var(--text-muted)">Nenhuma mensagem encontrada.</td></tr>`;
+        return;
+    }
+    tbody.innerHTML=lista.map(m=> `
+        <tr>
+            <td><strong>${m.protocolo||'#'+m.id}</strong></td>
+            <td>${m.nome}</td>
+            <td style="max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap" title="${m.email}">${m.email}</td>
+            <td style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap" title="${m.assunto}">${m.assunto}</td>
+            <td><span class="admin-prod-cat">${m.categoria}</span></td>
+            <td style="white-space:nowrap">${formatarDataMensagem(m.data)}</td>
+            <td><span class="admin-badge-status admin-badge-status--${(m.status||'nova').toLowerCase().replace(/[^a-z]/g,'')}">${m.status||'Nova'}</span></td>
+            <td>
+                <div class="admin-actions">
+                    <button class="btn btn--ghost" onclick="abrirMensagem('${m.id}')">Ver</button>
+                    <select class="admin-select-status" data-id="${m.id}" aria-label="Status ${m.protocolo}">
+                        ${['Nova','Em atendimento','Respondida','Encerrada'].map(s=> `<option value="${s}" ${s===(m.status||'Nova')?'selected':''}>${s}</option>`).join('')}
+                    </select>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+    tbody.querySelectorAll('.admin-select-status').forEach(sel=>{
+        sel.addEventListener('change', (e)=>{
+            const id=e.target.getAttribute('data-id');
+            const novo=e.target.value;
+            const arr=getMensagens();
+            const idx=arr.findIndex(x=> String(x.id)===String(id));
+            if(idx!==-1){ arr[idx].status=novo; salvarMensagens(arr); renderMensagensTabela(); if(typeof renderDashboard==='function') renderDashboard(); if(typeof mostrarToast==='function') mostrarToast('Status atualizado','success'); }
+        });
+    });
+}
+function abrirMensagem(id){
+    const lista=getMensagens();
+    const m=lista.find(x=> String(x.id)===String(id));
+    if(!m) return;
+    _mensagemAbertaId=id;
+    const detalhe=document.getElementById('mensagem-detalhe');
+    const titulo=document.getElementById('mensagem-modal-titulo');
+    if(titulo) titulo.textContent=`${m.protocolo} — ${m.assunto}`;
+    if(detalhe){
+        detalhe.innerHTML=`
+            <div style="display:grid; gap:8px; background:var(--background); border:1px solid var(--border); border-radius:10px; padding:14px">
+                <div><strong>Nome:</strong> ${m.nome}</div>
+                <div><strong>E-mail:</strong> <a href="mailto:${m.email}" class="link">${m.email}</a></div>
+                <div><strong>Categoria:</strong> ${m.categoria}</div>
+                <div><strong>Data:</strong> ${formatarDataMensagem(m.data)}</div>
+                <div><strong>Protocolo:</strong> ${m.protocolo}</div>
+                <div><strong>Status:</strong> ${m.status}</div>
+            </div>
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px; white-space:pre-wrap; word-break:break-word">${m.mensagem}</div>
+        `;
+    }
+    const sel=document.getElementById('mensagem-status-select');
+    if(sel) sel.value=m.status||'Nova';
+    const modal=document.getElementById('mensagem-modal');
+    if(modal){ modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+}
+function fecharMensagemModal(){
+    const modal=document.getElementById('mensagem-modal');
+    if(modal){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+    _mensagemAbertaId=null;
+}
+function configurarMensagensAdmin(){
+    if(!document.getElementById('mensagens-tbody')) return;
+    const busca=document.getElementById('mensagens-busca');
+    const filtroStatus=document.getElementById('mensagens-filtro-status');
+    const filtroCat=document.getElementById('mensagens-filtro-categoria');
+    if(busca) busca.addEventListener('input', ()=>{ _mensagensBusca=busca.value.trim(); renderMensagensTabela(); });
+    if(filtroStatus) filtroStatus.addEventListener('change', ()=>{ _mensagensFiltroStatus=filtroStatus.value; renderMensagensTabela(); });
+    if(filtroCat) filtroCat.addEventListener('change', ()=>{ _mensagensFiltroCategoria=filtroCat.value; renderMensagensTabela(); });
+    document.getElementById('mensagem-close')?.addEventListener('click', fecharMensagemModal);
+    document.getElementById('mensagem-fechar')?.addEventListener('click', fecharMensagemModal);
+    document.getElementById('mensagem-overlay')?.addEventListener('click', fecharMensagemModal);
+    document.getElementById('mensagem-salvar-status')?.addEventListener('click', ()=>{
+        if(!_mensagemAbertaId) return;
+        const sel=document.getElementById('mensagem-status-select');
+        const novo= sel ? sel.value : 'Nova';
+        const arr=getMensagens();
+        const idx=arr.findIndex(x=> String(x.id)===String(_mensagemAbertaId));
+        if(idx!==-1){ arr[idx].status=novo; salvarMensagens(arr); renderMensagensTabela(); fecharMensagemModal(); if(typeof renderDashboard==='function') renderDashboard(); if(typeof mostrarToast==='function') mostrarToast('Status atualizado','success'); }
+    });
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') fecharMensagemModal(); });
+    renderMensagensTabela();
+}
+
 // ---------- Configurações (ETAPA 6) ----------
 const CONFIG_DEFAULT = {
     nome: 'TechStore',
@@ -556,6 +698,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderDashboard();
     configurarProdutosAdmin();
     configurarPedidosAdmin();
+    configurarMensagensAdmin();
     configurarConfiguracoes();
     document.getElementById('admin-logout')?.addEventListener('click', ()=> {
         if (typeof logout === 'function') logout();
@@ -568,9 +711,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('focus', renderDashboard);
     window.addEventListener('storage', (e)=>{
         if (e.key === PRODUTOS_ADMIN_KEY || e.key === 'techstore_produtos' || e.key === PEDIDOS_KEY) { renderDashboard(); renderProdutosTabela(); renderPedidosTabela(); }
+        if (e.key === MENSAGENS_KEY) { renderDashboard(); renderMensagensTabela(); }
     });
     window.addEventListener('produtos:atualizado', ()=> { renderDashboard(); renderProdutosTabela(); });
     window.addEventListener('pedidos:atualizado', ()=> { renderDashboard(); renderPedidosTabela(); });
+    window.addEventListener('mensagens:atualizado', ()=> { renderDashboard(); renderMensagensTabela(); });
 });
 
 // Expor para testes e inline handlers
