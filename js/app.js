@@ -369,9 +369,16 @@ function logoutSafe() {
         try { localStorage.removeItem('techstore_currentUser'); } catch {}
     }
 }
+function isAdminSafe() {
+    try {
+        if (typeof isAdmin === 'function' && isAdmin()) return true;
+        if (window.TechStoreAuth && typeof window.TechStoreAuth.isAdmin === 'function' && window.TechStoreAuth.isAdmin()) return true;
+        const u = getCurrentUserSafe();
+        return !!(u && u.autenticado && u.tipo === 'admin');
+    } catch { return false; }
+}
 function atualizarHeaderAuth() {
     let container = document.getElementById('auth-area');
-    // fallback: injeta se página antiga ainda não tem o container (compat)
     if (!container) {
         const actions = document.querySelector('.header__actions');
         const cart = document.querySelector('.cart-icon');
@@ -383,26 +390,65 @@ function atualizarHeaderAuth() {
         else actions.appendChild(container);
     }
     const user = getCurrentUserSafe();
+    const admin = isAdminSafe();
     if (user && user.nome) {
         const primeiro = user.nome.split(' ')[0];
-        // escapa HTML básico
         const safeNome = primeiro.replace(/[<>&"]/g, s => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[s]));
-        container.innerHTML = `
-            <div class="auth-user" role="status" aria-live="polite">
-                <span class="auth-user-name">Olá, <span>${safeNome}</span></span>
-                <button type="button" class="auth-logout" id="logout-btn" aria-label="Sair da conta">Sair</button>
-            </div>
-        `;
+        if (admin) {
+            // Admin: mostra Painel Admin + dropdown com Sair (mantém sessão até Sair)
+            container.innerHTML = `
+                <div class="auth-user auth-user--admin" role="status" aria-live="polite" id="admin-user-menu">
+                    <button type="button" class="auth-user-trigger" id="admin-menu-trigger" aria-expanded="false" aria-haspopup="true">
+                        <span class="auth-user-name">Olá, <span>${safeNome}</span></span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                    </button>
+                    <div class="auth-dropdown" id="admin-dropdown" role="menu">
+                        <a href="admin/index.html" class="auth-dropdown__link" role="menuitem">Painel Admin</a>
+                        <a href="admin/produtos.html" class="auth-dropdown__link" role="menuitem">Gerenciar produtos</a>
+                        <button type="button" class="auth-dropdown__link auth-dropdown__link--logout" id="logout-btn" role="menuitem">Sair</button>
+                    </div>
+                </div>
+                <a href="admin/index.html" class="btn btn--primary btn--sm admin-link-desktop" style="padding:8px 14px; font-size:.85rem; border-radius:999px; margin-left:4px">Painel Admin</a>
+            `;
+            // dropdown toggle
+            const trigger = document.getElementById('admin-menu-trigger');
+            const dropdown = document.getElementById('admin-dropdown');
+            const menu = document.getElementById('admin-user-menu');
+            if (trigger && dropdown && menu) {
+                trigger.addEventListener('click', (e)=>{
+                    e.stopPropagation();
+                    const open = menu.classList.toggle('open');
+                    trigger.setAttribute('aria-expanded', open);
+                    dropdown.style.display = open ? 'grid' : 'none';
+                });
+                document.addEventListener('click', (e)=>{
+                    if (!menu.contains(e.target)) {
+                        menu.classList.remove('open');
+                        trigger.setAttribute('aria-expanded','false');
+                        dropdown.style.display='none';
+                    }
+                });
+                document.addEventListener('keydown', (e)=>{
+                    if (e.key==='Escape') {
+                        menu.classList.remove('open');
+                        trigger.setAttribute('aria-expanded','false');
+                        dropdown.style.display='none';
+                    }
+                });
+            }
+        } else {
+            container.innerHTML = `
+                <div class="auth-user" role="status" aria-live="polite">
+                    <span class="auth-user-name">Olá, <span>${safeNome}</span></span>
+                    <button type="button" class="auth-logout" id="logout-btn" aria-label="Sair da conta">Sair</button>
+                </div>
+            `;
+        }
         const btn = document.getElementById('logout-btn');
         if (btn) btn.addEventListener('click', () => {
             logoutSafe();
             mostrarToast(`Até logo, ${safeNome}!`, 'success');
             atualizarHeaderAuth();
-            // se estiver em página que exige login futuro, apenas atualiza; não redireciona bruscamente
-            setTimeout(() => {
-                // opcional: recarrega para limpar estados dependentes
-                // window.location.reload();
-            }, 200);
         });
     } else {
         container.innerHTML = `

@@ -23,9 +23,15 @@ const RESET_KEY = 'techstore_reset';
 // Em produção use backend, hash com salt, sessões seguras, HTTPS e RBAC no servidor.
 // Credenciais de demonstração (não exibir na UI pública):
 //   admin@techstore.com / TechStore@Admin2026
-// Hash SHA-256 da senha demonstrativa (não armazene senha em texto puro):
-const ADMIN_EMAIL = 'admin@techstore.com';
-const ADMIN_HASH = 'bcee2a0ca08e57a9e79114c9b3a09ac34d57774e4cb2e3e161c3d55deeffc63f';
+//   ryan.souza@techstore.com / Ryan@TechStore2026!  <-- SEU ACESSO EXCLUSIVO
+// Hashes SHA-256 (não armazene senha em texto puro):
+const ADMIN_USERS = [
+    { email: 'admin@techstore.com', hash: 'bcee2a0ca08e57a9e79114c9b3a09ac34d57774e4cb2e3e161c3d55deeffc63f', nome: 'Administrador' },
+    { email: 'ryan.souza@techstore.com', hash: 'fe76b40c9ec0b7084dd47b07183bf326083e28354e76b7a140e3e52ac1b4ad2d', nome: 'Ryan Souza' }
+];
+// Compatibilidade: mantém constantes antigas apontando para o primeiro admin
+const ADMIN_EMAIL = ADMIN_USERS[0].email;
+const ADMIN_HASH = ADMIN_USERS[0].hash;
 
 // ---------- Utilidades base ----------
 
@@ -141,11 +147,12 @@ function protegerPaginaAdmin() {
 // Wrapper login() para compatibilidade com spec (diferencia cliente/admin)
 async function login(email, senha) {
     const normalized = (email || '').trim().toLowerCase();
-    // tenta admin primeiro (não está em techstore_users)
-    if (normalized === ADMIN_EMAIL) {
+    // tenta admin primeiro (não está em techstore_users) - suporta múltiplos admins
+    const admin = ADMIN_USERS.find(a => a.email.toLowerCase() === normalized);
+    if (admin) {
         const h = await hashSenha(senha);
-        if (h === ADMIN_HASH) {
-            const adminUser = { id: 'admin', nome: 'Administrador', email: ADMIN_EMAIL, tipo: 'admin' };
+        if (h === admin.hash) {
+            const adminUser = { id: 'admin-' + normalized.replace(/[^a-z0-9]/g,''), nome: admin.nome, email: admin.email, tipo: 'admin' };
             setCurrentUser(adminUser);
             return { ok: true, user: adminUser, isAdmin: true };
         }
@@ -372,7 +379,7 @@ async function handleCadastro(e) {
     } else if (!validarEmail(email.trim())) {
         showFieldError('erro-email', 'E-mail inválido. Ex: voce@exemplo.com');
         hasError = true;
-    } else if (email.trim().toLowerCase() === ADMIN_EMAIL) {
+    } else if (ADMIN_USERS.some(a => a.email.toLowerCase() === email.trim().toLowerCase())) {
         showFieldError('erro-email', 'Este e-mail é reservado.');
         hasError = true;
     } else if (buscarUsuario(email)) {
