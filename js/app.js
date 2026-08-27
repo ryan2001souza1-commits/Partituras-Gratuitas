@@ -312,6 +312,66 @@ function configurarProdutoPage() {
     });
 }
 
+// Auth header - integração com auth.js (ETAPA 5)
+function getCurrentUserSafe() {
+    if (window.TechStoreAuth && typeof window.TechStoreAuth.getCurrentUser === 'function') {
+        try { return window.TechStoreAuth.getCurrentUser(); } catch { return null; }
+    }
+    try {
+        const raw = localStorage.getItem('techstore_currentUser');
+        return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+}
+function logoutSafe() {
+    if (window.TechStoreAuth && typeof window.TechStoreAuth.logout === 'function') {
+        window.TechStoreAuth.logout();
+    } else {
+        try { localStorage.removeItem('techstore_currentUser'); } catch {}
+    }
+}
+function atualizarHeaderAuth() {
+    let container = document.getElementById('auth-area');
+    // fallback: injeta se página antiga ainda não tem o container (compat)
+    if (!container) {
+        const actions = document.querySelector('.header__actions');
+        const cart = document.querySelector('.cart-icon');
+        if (!actions) return;
+        container = document.createElement('div');
+        container.id = 'auth-area';
+        container.className = 'auth-area';
+        if (cart) actions.insertBefore(container, cart);
+        else actions.appendChild(container);
+    }
+    const user = getCurrentUserSafe();
+    if (user && user.nome) {
+        const primeiro = user.nome.split(' ')[0];
+        // escapa HTML básico
+        const safeNome = primeiro.replace(/[<>&"]/g, s => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[s]));
+        container.innerHTML = `
+            <div class="auth-user" role="status" aria-live="polite">
+                <span class="auth-user-name">Olá, <span>${safeNome}</span></span>
+                <button type="button" class="auth-logout" id="logout-btn" aria-label="Sair da conta">Sair</button>
+            </div>
+        `;
+        const btn = document.getElementById('logout-btn');
+        if (btn) btn.addEventListener('click', () => {
+            logoutSafe();
+            mostrarToast(`Até logo, ${safeNome}!`, 'success');
+            atualizarHeaderAuth();
+            // se estiver em página que exige login futuro, apenas atualiza; não redireciona bruscamente
+            setTimeout(() => {
+                // opcional: recarrega para limpar estados dependentes
+                // window.location.reload();
+            }, 200);
+        });
+    } else {
+        container.innerHTML = `
+            <a href="login.html" class="auth-link">Entrar</a>
+            <a href="cadastro.html" class="btn btn--primary btn--sm" style="padding:8px 14px; font-size:.85rem; border-radius:999px">Criar conta</a>
+        `;
+    }
+}
+
 // Menu mobile + Dark mode
 function configurarUI() {
     const toggle = document.getElementById('menu-toggle');
@@ -369,6 +429,7 @@ function configurarUI() {
 document.addEventListener('DOMContentLoaded', () => {
     atualizarContadorCarrinho();
     configurarUI();
+    atualizarHeaderAuth();
     renderHome();
     configurarProdutosPage();
     configurarProdutoPage();

@@ -903,6 +903,70 @@ body.dark .remove-btn:hover { background:#7f1d1d; color:#fecaca; }
     .carrinho-item__acoes { grid-column:1 / -1; justify-content:space-between; }
 }
 
+/* ================= AUTH HEADER (integração) ================= */
+.auth-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.auth-link {
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: var(--radius-full);
+    transition: all .2s;
+    white-space: nowrap;
+}
+.auth-link:hover { color: var(--primary); background: var(--primary-light); }
+.auth-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 4px 4px 4px 14px;
+    box-shadow: var(--shadow);
+}
+.auth-user-name {
+    font-size: .86rem;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.auth-user-name span { color: var(--primary); }
+.auth-logout {
+    border: none;
+    background: var(--text);
+    color: #fff;
+    font-size: .80rem;
+    font-weight: 700;
+    padding: 7px 12px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all .2s;
+}
+.auth-logout:hover { background: var(--secondary); transform: translateY(-1px); }
+body.dark .auth-user { background: #0f172a; border-color: #334155; }
+body.dark .auth-user-name { color: #f1f5f9; }
+
+@media (max-width: 860px) {
+    .auth-area { order: 10; }
+    .auth-user-name { max-width: 100px; }
+}
+@media (max-width: 768px) {
+    .auth-area .btn { display: none; } /* prioriza link simples no mobile */
+}
+@media (max-width: 520px) {
+    .auth-user { padding: 3px 3px 3px 10px; }
+    .auth-user-name { font-size: .82rem; }
+}
+
 /* Animações leves */
 @media (prefers-reduced-motion: no-preference) {
     .card, .categoria-card, .btn { will-change: transform; }
