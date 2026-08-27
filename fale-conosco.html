@@ -125,16 +125,16 @@
                             <span class="field-error" id="erro-fale-categoria"></span>
                         </div>
                     </div>
-                    <div class="field">
-                        <label for="fale-mensagem" class="field-label">Mensagem *</label>
-                        <div class="input-wrap fale-input-wrap fale-input-wrap--textarea">
-                            <textarea id="fale-mensagem" class="input" placeholder="Conte-nos em detalhes como podemos ajudar..." required rows="5"></textarea>
+                        <div class="field">
+                            <label for="fale-mensagem" class="field-label">Mensagem * <span style="font-weight:400; color:var(--text-muted); font-size:.80rem">(até 1000 caracteres)</span></label>
+                            <div class="input-wrap fale-input-wrap fale-input-wrap--textarea">
+                                <textarea id="fale-mensagem" class="input" placeholder="Conte-nos em detalhes como podemos ajudar... Quanto mais detalhes, melhor poderemos te ajudar!" required rows="8" maxlength="1000" style="min-height:180px; line-height:1.6"></textarea>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; gap:12px; align-items:center">
+                                <span class="field-error" id="erro-fale-mensagem" style="flex:1"></span>
+                                <span id="fale-contador" class="fale-contador">0 / 1000</span>
+                            </div>
                         </div>
-                        <div style="display:flex; justify-content:space-between; gap:12px; align-items:center">
-                            <span class="field-error" id="erro-fale-mensagem" style="flex:1"></span>
-                            <span id="fale-contador" class="fale-contador">0 / 20 mínimo</span>
-                        </div>
-                    </div>
                     <button type="submit" class="btn btn--primary fale-btn" id="fale-enviar">
                         <span class="btn-text">Enviar mensagem</span>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
@@ -386,14 +386,21 @@
             }catch{ return []; }
         }
 
-        // contador
+        // contador - agora até 1000
         if (msgEl && contador) {
-            msgEl.addEventListener('input', ()=>{
-                const len = msgEl.value.trim().length;
-                contador.textContent = len + ' / 20 mínimo';
-                contador.style.color = len >= 20 ? 'var(--success)' : 'var(--text-muted)';
-                if (len) showFieldError('erro-fale-mensagem','');
-            });
+            const atualizarContador = ()=>{
+                const len = msgEl.value.length;
+                const trimLen = msgEl.value.trim().length;
+                contador.textContent = len + ' / 1000';
+                if (len > 1000) contador.style.color = 'var(--danger)';
+                else if (len > 900) contador.style.color = 'var(--warning)';
+                else if (trimLen >= 20) contador.style.color = 'var(--success)';
+                else contador.style.color = 'var(--text-muted)';
+                if (trimLen) showFieldError('erro-fale-mensagem','');
+            };
+            msgEl.addEventListener('input', atualizarContador);
+            // inicializa
+            atualizarContador();
         }
         // limpa erro ao digitar
         ['fale-nome','fale-email','fale-assunto','fale-categoria'].forEach(id=>{
@@ -424,6 +431,7 @@
             if(!categoria){ showFieldError('erro-fale-categoria','Selecione uma categoria.'); hasError=true; }
             if(!mensagem){ showFieldError('erro-fale-mensagem','Escreva sua mensagem.'); hasError=true; }
             else if(mensagem.length < 20){ showFieldError('erro-fale-mensagem','Mensagem muito curta. Mínimo 20 caracteres.'); hasError=true; }
+            else if(mensagem.length > 1000){ showFieldError('erro-fale-mensagem','Mensagem muito longa. Máximo 1000 caracteres.'); hasError=true; }
 
             if(hasError){
                 showFeedback('Corrija os campos destacados e tente novamente.', 'error');
@@ -450,7 +458,7 @@
             showFeedback('Mensagem enviada com sucesso!', 'success');
             if(typeof mostrarToast === 'function') mostrarToast('Mensagem enviada! Protocolo ' + protocolo, 'success');
             form.reset();
-            if(contador){ contador.textContent='0 / 20 mínimo'; contador.style.color='var(--text-muted)'; }
+            if(contador){ contador.textContent='0 / 1000'; contador.style.color='var(--text-muted)'; }
             form.querySelectorAll('.input').forEach(i=>{ i.classList.remove('input--error','input--success'); i.removeAttribute('aria-invalid'); });
             try{ sucesso.scrollIntoView({behavior:'smooth', block:'nearest'}); }catch{}
         });
