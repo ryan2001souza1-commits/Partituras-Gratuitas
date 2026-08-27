@@ -895,6 +895,28 @@ body.dark .remove-btn:hover { background:#7f1d1d; color:#fecaca; }
 .resumo-linha.total { border-top:1px solid var(--border); margin-top:8px; padding-top:12px; font-weight:800; font-size:1.1rem; }
 .frete-gratis { color:var(--success); font-weight:700; font-size:.85rem; }
 .checkout-btn { width:100%; margin-top:16px; }
+.entrega-box {
+    background: linear-gradient(180deg, var(--surface) 0%, #f8fafc 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    display: grid;
+    gap: 8px;
+}
+body.dark .entrega-box { background: #162032; border-color: #334155; }
+.entrega-header { font-weight: 800; font-size: .95rem; display: flex; align-items: center; gap: 6px; }
+.entrega-cep-linha { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--background); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+body.dark .entrega-cep-linha { background: #0f172a; }
+.entrega-cep-linha strong { color: var(--primary); letter-spacing: .04em; }
+.entrega-alterar { background: none; border: none; color: var(--primary); font-weight: 800; font-size: .82rem; cursor: pointer; padding: 4px 8px; border-radius: 8px; }
+.entrega-alterar:hover { background: var(--primary-light); }
+.entrega-endereco { font-size: .85rem; color: var(--success); font-weight: 600; line-height: 1.4; }
+body.dark .entrega-endereco { color: #86efac; }
+.entrega-frete { display: flex; justify-content: space-between; font-size: .92rem; font-weight: 700; padding: 6px 0; border-top: 1px dashed var(--border); margin-top: 4px; }
+.entrega-prazo { font-size: .82rem; color: var(--text-muted); }
+.entrega-loading { font-size: .82rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px; }
+.entrega-loading::before { content: ""; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin .7s linear infinite; display: inline-block; }
+.entrega-cep-vazio { font-size: .88rem; color: var(--text-muted); }
 
 @media (max-width:860px){
     .carrinho-layout { grid-template-columns:1fr; }
@@ -965,6 +987,170 @@ body.dark .auth-user-name { color: #f1f5f9; }
 @media (max-width: 520px) {
     .auth-user { padding: 3px 3px 3px 10px; }
     .auth-user-name { font-size: .82rem; }
+}
+
+/* ================= CEP BAR & MODAL (ETAPA 1) ================= */
+.cep-bar {
+    background: linear-gradient(90deg, #eff6ff 0%, #f8fafc 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 0;
+    font-size: .88rem;
+    color: var(--text);
+    display: none;
+}
+body.dark .cep-bar { background: #162032; border-color: #334155; color: #e2e8f0; }
+.cep-bar__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.cep-bar__info { font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.cep-bar__info strong { color: var(--primary); letter-spacing: .02em; }
+.cep-bar__btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    font-weight: 700;
+    font-size: .82rem;
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all .18s;
+}
+.cep-bar__btn:hover { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); }
+body.dark .cep-bar__btn { background: #0f172a; border-color: #334155; color: #93c5fd; }
+body.dark .cep-bar__btn:hover { background: #1e293b; border-color: #60a5fa; }
+
+.cep-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+.cep-modal.open { display: flex; }
+.cep-modal__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.52);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: cepFade .22s ease;
+}
+.cep-modal__content {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+    width: 100%;
+    max-width: 420px;
+    max-height: 90vh;
+    max-height: 90dvh;
+    overflow: auto;
+    padding: 26px 24px 20px;
+    animation: cepIn .30s cubic-bezier(.16,1,.3,1);
+}
+body.dark .cep-modal__content { background: #1e293b; border-color: #334155; }
+.cep-modal__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--background);
+    color: var(--text-muted);
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: all .18s;
+}
+.cep-modal__close:hover { background: var(--surface); color: var(--text); border-color: var(--border-strong); transform: rotate(90deg); }
+.cep-modal__header { text-align: center; margin-bottom: 18px; }
+.cep-modal__icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 12px;
+    background: var(--primary-light);
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+}
+body.dark .cep-modal__icon { background: #1e3a5f; }
+.cep-modal__title { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; line-height: 1.2; }
+.cep-modal__desc { color: var(--text-muted); font-size: .90rem; line-height: 1.5; max-width: 32ch; margin: 0 auto; }
+.cep-form { display: grid; gap: 10px; margin-top: 16px; }
+.cep-label { font-size: .82rem; font-weight: 700; letter-spacing: .02em; color: var(--text); }
+.cep-input-wrap { position: relative; }
+.cep-input {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: var(--background);
+    color: var(--text);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-align: center;
+    outline: none;
+    transition: border-color .18s, box-shadow .18s, background .18s;
+}
+.cep-input::placeholder { color: var(--text-muted); opacity: .7; letter-spacing: .12em; }
+.cep-input:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 3px var(--primary-light); }
+.cep-input.input--error { border-color: var(--danger) !important; background: #fff5f5 !important; box-shadow: 0 0 0 3px rgba(220,38,38,.12) !important; }
+body.dark .cep-input.input--error { background: #2a0f14 !important; }
+.cep-erro { min-height: 0; font-size: .80rem; font-weight: 600; color: var(--danger); line-height: 1.35; display: none; }
+.cep-erro.show { display: block; animation: cepErr .25s ease; }
+.cep-btn { width: 100%; margin-top: 4px; border-radius: 12px; padding: 13px 18px; font-size: .97rem; }
+.cep-link {
+    display: block;
+    margin: 12px auto 0;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: .84rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all .18s;
+}
+.cep-link:hover { color: var(--text); background: var(--background); }
+
+.cep-bar__endereco { font-weight: 400; color: var(--text-muted); font-size: .86rem; }
+body.dark .cep-bar__endereco { color: #94a3b8; }
+.cep-endereco-preview {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: .88rem;
+    line-height: 1.45;
+    display: none;
+}
+.cep-endereco-preview.show { display: block; animation: cepErr .25s ease; }
+.cep-endereco-preview--success { background: #f0fdf4; border-color: #bbf7d0; }
+body.dark .cep-endereco-preview { background: #052e16; border-color: #14532d; color: #bbf7d0; }
+.cep-loader svg { animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@keyframes cepFade { from { opacity:0 } to { opacity:1 } }
+@keyframes cepIn { from { opacity:0; transform: translateY(10px) scale(.98) } to { opacity:1; transform: translateY(0) scale(1) } }
+@keyframes cepErr { from { opacity:0; transform: translateY(-4px)} to {opacity:1; transform:none} }
+
+@media (max-width: 480px) {
+    .cep-modal { padding: 12px; align-items: flex-end; }
+    .cep-modal__content { border-radius: 16px; padding: 22px 18px 18px; max-width: none; }
+    .cep-bar__content { flex-wrap: wrap; justify-content: center; text-align: center; }
 }
 
 /* Animações leves */
