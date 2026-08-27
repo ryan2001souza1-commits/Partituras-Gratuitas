@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechStore - Eletrônicos com os melhores preços</title>
+    <meta name="description" content="TechStore - Sua loja de eletrônicos: smartphones, notebooks, placas de vídeo e muito mais.">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header" id="header">
+        <div class="container header__content">
+            <a href="index.html" class="logo">Tech<span>Store</span></a>
+
+            <nav class="nav" id="nav">
+                <ul class="nav__list">
+                    <li><a href="index.html" class="nav__link active">Início</a></li>
+                    <li><a href="produtos.html" class="nav__link">Produtos</a></li>
+                    <li><a href="produtos.html?categoria=Smartphones" class="nav__link">Smartphones</a></li>
+                    <li><a href="produtos.html?categoria=Notebooks" class="nav__link">Notebooks</a></li>
+                    <li><a href="#categorias" class="nav__link">Categorias</a></li>
+                </ul>
+            </nav>
+
+            <div class="header__actions">
+                <div class="search">
+                    <input type="search" id="search-input" class="search__input" placeholder="Buscar produto..." autocomplete="off" aria-label="Buscar produto">
+                    <button class="search__btn" id="search-btn" aria-label="Buscar">&#128269;</button>
+                </div>
+
+                <button class="icon-btn" id="dark-mode-btn" aria-label="Alternar tema">&#9790;</button>
+
+                <a href="carrinho.html" class="cart-icon" aria-label="Carrinho">
+                    &#128722;
+                    <span class="cart-count" id="cart-count">0</span>
+                </a>
+
+                <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- BANNER PRINCIPAL -->
+    <section class="banner">
+        <div class="container banner__content">
+            <div class="banner__text">
+                <span class="banner__tag">Ofertas da semana</span>
+                <h1>Tech que <span>impulsiona</span> você</h1>
+                <p>Até 40% OFF em notebooks, placas de vídeo e smartphones. Frete grátis para todo o Brasil.</p>
+                <div class="banner__actions">
+                    <a href="produtos.html" class="btn btn--primary">Ver ofertas</a>
+                    <a href="#destaques" class="btn btn--outline">Mais vendidos</a>
+                </div>
+                <div class="banner__info">
+                    <span>✔ 12x sem juros</span>
+                    <span>✔ Entrega rápida</span>
+                    <span>✔ Garantia estendida</span>
+                </div>
+            </div>
+            <div class="banner__image">
+                <!-- Imagem será estilizada via CSS -->
+                <div class="banner__placeholder">Montagem Gamer + Notebook + Smartphone</div>
+            </div>
+        </div>
+    </section>
+
+    <main>
+        <!-- CATEGORIAS -->
+        <section class="section categorias" id="categorias">
+            <div class="container">
+                <h2 class="section__title">Navegue por categoria</h2>
+                <div class="categorias__grid">
+                    <a href="produtos.html?categoria=Smartphones" class="categoria-card">Smartphones</a>
+                    <a href="produtos.html?categoria=Notebooks" class="categoria-card">Notebooks</a>
+                    <a href="produtos.html?categoria=Computadores" class="categoria-card">Computadores</a>
+                    <a href="produtos.html?categoria=Processadores" class="categoria-card">Processadores</a>
+                    <a href="produtos.html?categoria=Placas de vídeo" class="categoria-card">Placas de vídeo</a>
+                    <a href="produtos.html?categoria=Memórias RAM" class="categoria-card">Memórias RAM</a>
+                    <a href="produtos.html?categoria=SSDs" class="categoria-card">SSDs</a>
+                    <a href="produtos.html?categoria=Monitores" class="categoria-card">Monitores</a>
+                    <a href="produtos.html?categoria=Teclados" class="categoria-card">Teclados</a>
+                    <a href="produtos.html?categoria=Mouses" class="categoria-card">Mouses</a>
+                    <a href="produtos.html?categoria=Headsets" class="categoria-card">Headsets</a>
+                    <a href="produtos.html?categoria=Acessórios" class="categoria-card">Acessórios</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- DESTAQUES -->
+        <section class="section destaques" id="destaques">
+            <div class="container">
+                <div class="section__header">
+                    <h2 class="section__title">Produtos em destaque</h2>
+                    <a href="produtos.html" class="link">Ver todos →</a>
+                </div>
+                <div class="produtos__grid" id="destaques-grid">
+                    <!-- Preenchido via JS na Etapa 3 -->
+                    <p class="loading">Carregando destaques...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- OFERTAS -->
+        <section class="section ofertas" id="ofertas">
+            <div class="container">
+                <div class="section__header">
+                    <h2 class="section__title">Ofertas imperdíveis</h2>
+                    <span class="badge">Até 40% OFF</span>
+                </div>
+                <div class="produtos__grid" id="ofertas-grid">
+                    <!-- Preenchido via JS na Etapa 3 -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="footer">
+        <div class="container footer__content">
+            <div class="footer__col">
+                <a href="index.html" class="logo logo--footer">Tech<span>Store</span></a>
+                <p>Sua loja de confiança em eletrônicos desde 2026. Qualidade, preço justo e entrega rápida.</p>
+            </div>
+            <div class="footer__col">
+                <h4>Categorias</h4>
+                <ul>
+                    <li><a href="produtos.html?categoria=Smartphones">Smartphones</a></li>
+                    <li><a href="produtos.html?categoria=Notebooks">Notebooks</a></li>
+                    <li><a href="produtos.html?categoria=Placas de vídeo">Placas de vídeo</a></li>
+                    <li><a href="produtos.html?categoria=Monitores">Monitores</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <h4>Ajuda</h4>
+                <ul>
+                    <li><a href="#">Frete e entrega</a></li>
+                    <li><a href="#">Trocas e devoluções</a></li>
+                    <li><a href="#">Formas de pagamento</a></li>
+                    <li><a href="#">Fale conosco</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <h4>Contato</h4>
+                <p>contato@techstore.com.br<br>(11) 99999-0000<br>Seg a Sex 9h às 18h</p>
+            </div>
+        </div>
+        <div class="footer__bottom">
+            <div class="container">
+                <p>&copy; 2026 TechStore. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+
+    <script src="js/produtos.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

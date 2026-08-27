@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos | TechStore</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header" id="header">
+        <div class="container header__content">
+            <a href="index.html" class="logo">Tech<span>Store</span></a>
+            <nav class="nav" id="nav">
+                <ul class="nav__list">
+                    <li><a href="index.html" class="nav__link">Início</a></li>
+                    <li><a href="produtos.html" class="nav__link active">Produtos</a></li>
+                    <li><a href="produtos.html?categoria=Smartphones" class="nav__link">Smartphones</a></li>
+                    <li><a href="produtos.html?categoria=Notebooks" class="nav__link">Notebooks</a></li>
+                </ul>
+            </nav>
+            <div class="header__actions">
+                <div class="search">
+                    <input type="search" id="search-input" class="search__input" placeholder="Buscar produto..." aria-label="Buscar produto" autocomplete="off">
+                    <button class="search__btn" id="search-btn" aria-label="Buscar">&#128269;</button>
+                </div>
+                <button class="icon-btn" id="dark-mode-btn" aria-label="Alternar tema">&#9790;</button>
+                <a href="carrinho.html" class="cart-icon" aria-label="Carrinho">&#128722;<span class="cart-count" id="cart-count">0</span></a>
+                <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false"><span></span><span></span><span></span></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container section produtos-page">
+        <div class="produtos-top">
+            <div>
+                <h1 class="section__title" style="margin-bottom:4px">Todos os produtos</h1>
+                <p id="result-count" class="text-muted" style="color:var(--text-muted); font-size:.92rem">Carregando...</p>
+            </div>
+            <div class="produtos-top__actions">
+                <span id="busca-termo" style="font-size:.9rem; color:var(--text-muted)"></span>
+            </div>
+        </div>
+
+        <div class="filtros">
+            <div class="filtro-group">
+                <label for="filtro-categoria">Categoria</label>
+                <select id="filtro-categoria">
+                    <option value="">Todas</option>
+                    <option value="Smartphones">Smartphones</option>
+                    <option value="Notebooks">Notebooks</option>
+                    <option value="Computadores">Computadores</option>
+                    <option value="Processadores">Processadores</option>
+                    <option value="Placas de vídeo">Placas de vídeo</option>
+                    <option value="Memórias RAM">Memórias RAM</option>
+                    <option value="SSDs">SSDs</option>
+                    <option value="Monitores">Monitores</option>
+                    <option value="Teclados">Teclados</option>
+                    <option value="Mouses">Mouses</option>
+                    <option value="Headsets">Headsets</option>
+                    <option value="Acessórios">Acessórios</option>
+                </select>
+            </div>
+
+            <div class="filtro-group">
+                <label for="filtro-preco">Preço</label>
+                <select id="filtro-preco">
+                    <option value="">Todos</option>
+                    <option value="0-500">Até R$ 500</option>
+                    <option value="500-1000">R$ 500 a R$ 1.000</option>
+                    <option value="1000-3000">R$ 1.000 a R$ 3.000</option>
+                    <option value="3000-5000">R$ 3.000 a R$ 5.000</option>
+                    <option value="5000-999999">Acima de R$ 5.000</option>
+                </select>
+            </div>
+
+            <div class="filtro-group">
+                <label for="ordenacao">Ordenar por</label>
+                <select id="ordenacao">
+                    <option value="">Relevância</option>
+                    <option value="menor">Menor preço</option>
+                    <option value="maior">Maior preço</option>
+                    <option value="desconto">Maior desconto</option>
+                    <option value="nome">Nome A-Z</option>
+                </select>
+            </div>
+
+            <button id="limpar-filtros" class="btn btn--ghost btn--sm" style="height:42px; align-self:end">Limpar filtros</button>
+        </div>
+
+        <div id="produtos-grid" class="produtos__grid"></div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <div class="footer__col">
+                <a href="index.html" class="logo logo--footer">Tech<span>Store</span></a>
+                <p>Tudo em tecnologia com os melhores preços e entrega rápida.</p>
+            </div>
+            <div class="footer__col">
+                <h4>Categorias</h4>
+                <ul>
+                    <li><a href="produtos.html?categoria=Smartphones">Smartphones</a></li>
+                    <li><a href="produtos.html?categoria=Notebooks">Notebooks</a></li>
+                    <li><a href="produtos.html?categoria=Placas de vídeo">Placas de vídeo</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <h4>Ajuda</h4>
+                <ul>
+                    <li><a href="#">Frete</a></li>
+                    <li><a href="#">Trocas</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <h4>Contato</h4>
+                <p>contato@techstore.com.br<br>(11) 99999-0000</p>
+            </div>
+        </div>
+        <div class="footer__bottom"><div class="container"><p>&copy; 2026 TechStore</p></div></div>
+    </footer>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+    <script src="js/produtos.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
