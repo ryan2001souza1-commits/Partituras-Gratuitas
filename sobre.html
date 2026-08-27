@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre | TechStore</title>
+    <meta name="description" content="Conheça a TechStore - sua loja de eletrônicos desde 2026.">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="header__top">
+        <div class="container header__top__content">
+            <span class="header__top__info">✈️ Frete grátis acima de R$ 500 • Entrega para todo o Brasil</span>
+            <div class="header__top__actions">
+                <button class="icon-btn icon-btn--sm" id="dark-mode-btn" aria-label="Alternar tema">&#9790;</button>
+                <a href="carrinho.html" class="cart-icon cart-icon--sm" aria-label="Carrinho">&#128722;<span class="cart-count" id="cart-count">0</span></a>
+            </div>
+        </div>
+    </div>
+    <header class="header" id="header">
+        <div class="container header__content">
+            <a href="index.html" class="logo">Tech<span>Store</span></a>
+            <nav class="nav" id="nav">
+                <ul class="nav__list">
+                    <li><a href="index.html" class="nav__link">Início</a></li>
+                    <li><a href="produtos.html" class="nav__link">Produtos</a></li>
+                    <li><a href="produtos.html?categoria=Smartphones" class="nav__link">Smartphones</a></li>
+                    <li><a href="produtos.html?categoria=Notebooks" class="nav__link">Notebooks</a></li>
+                    <li><a href="sobre.html" class="nav__link active">Sobre</a></li>
+                    <li><a href="fale-conosco.html" class="nav__link">Fale Conosco</a></li>
+                </ul>
+            </nav>
+            <div class="header__actions">
+                <div class="search">
+                    <input type="search" id="search-input" class="search__input" placeholder="Buscar produto..." autocomplete="off" aria-label="Buscar produto">
+                    <button class="search__btn" id="search-btn" aria-label="Buscar">&#128269;</button>
+                </div>
+                <div id="auth-area" class="auth-area" aria-live="polite">
+                    <a href="login.html" class="auth-link">Entrar</a>
+                    <a href="cadastro.html" class="btn btn--primary btn--sm" style="padding:8px 14px; font-size:.85rem; border-radius:999px">Criar conta</a>
+                </div>
+                <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu" aria-expanded="false">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section class="fale-hero" style="padding:42px 0 32px">
+        <div class="container fale-hero__content">
+            <div class="fale-hero__icon" aria-hidden="true">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <span class="fale-hero__badge">Desde 2026 • 20.000+ clientes</span>
+            <h1>Sobre a TechStore</h1>
+            <p>Sua loja de confiança em eletrônicos. Qualidade, preço justo e entrega rápida para todo o Brasil.</p>
+        </div>
+    </section>
+
+    <main class="container section">
+        <div style="max-width:860px; margin:0 auto; display:grid; gap:20px">
+            <div class="card" style="padding:24px; border-radius:16px">
+                <h2 class="section__title" style="font-size:1.35rem">Nossa história</h2>
+                <p style="color:var(--text-muted); line-height:1.7; margin-top:8px">A TechStore nasceu em 2026 com a missão de democratizar o acesso à tecnologia de ponta. Começamos pequenos, com foco em atendimento humano e curadoria de produtos — de smartphones e notebooks a placas de vídeo e acessórios. Hoje atendemos todo o Brasil com logística parceira, garantia estendida e suporte que realmente responde.</p>
+                <p style="color:var(--text-muted); line-height:1.7; margin-top:12px">Acreditamos que comprar tecnologia deve ser simples, seguro e sem sustos. Por isso exibimos preço à vista, parcelamento sem juros e estoque em tempo real.</p>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px">
+                <div class="card" style="padding:18px; text-align:center; border-radius:14px"><div style="font-size:1.4rem">🚀</div><strong>Missão</strong><p style="color:var(--text-muted); font-size:.88rem; margin-top:4px">Entregar tech com confiança e preço justo.</p></div>
+                <div class="card" style="padding:18px; text-align:center; border-radius:14px"><div style="font-size:1.4rem">👁️</div><strong>Visão</strong><p style="color:var(--text-muted); font-size:.88rem; margin-top:4px">Ser referência em eletrônicos no Brasil.</p></div>
+                <div class="card" style="padding:18px; text-align:center; border-radius:14px"><div style="font-size:1.4rem">💙</div><strong>Valores</strong><p style="color:var(--text-muted); font-size:.88rem; margin-top:4px">Transparência, respeito e inovação.</p></div>
+            </div>
+            <div class="card" style="padding:24px; border-radius:16px">
+                <h3 style="font-weight:800; margin-bottom:8px">Por que escolher a TechStore?</h3>
+                <ul style="display:grid; gap:8px; color:var(--text-muted); line-height:1.6; list-style:disc; padding-left:18px">
+                    <li>12x sem juros e 10% OFF no PIX</li>
+                    <li>Frete grátis acima de R$ 500 e rastreio para todo o Brasil</li>
+                    <li>Garantia estendida e suporte humano em até 24h</li>
+                    <li>Produtos originais com nota fiscal</li>
+                </ul>
+                <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap">
+                    <a href="produtos.html" class="btn btn--primary">Ver produtos</a>
+                    <a href="fale-conosco.html" class="btn btn--ghost">Fale conosco</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer__content">
+            <div class="footer__col">
+                <a href="index.html" class="logo logo--footer">Tech<span>Store</span></a>
+                <p>Sua loja de confiança em eletrônicos desde 2026. Qualidade, preço justo e entrega rápida.</p>
+            </div>
+            <div class="footer__col">
+                <h4>Categorias</h4>
+                <ul>
+                    <li><a href="produtos.html?categoria=Smartphones">Smartphones</a></li>
+                    <li><a href="produtos.html?categoria=Notebooks">Notebooks</a></li>
+                    <li><a href="produtos.html?categoria=Placas de vídeo">Placas de vídeo</a></li>
+                    <li><a href="produtos.html?categoria=Monitores">Monitores</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <h4>Ajuda</h4>
+                <ul>
+                    <li><a href="#">Frete e entrega</a></li>
+                    <li><a href="#">Trocas e devoluções</a></li>
+                    <li><a href="#">Formas de pagamento</a></li>
+                    <li><a href="fale-conosco.html">Fale conosco</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <h4>Contato</h4>
+                <p>contato@techstore.com.br<br>(11) 99999-0000<br>Seg a Sex 9h às 18h</p>
+            </div>
+        </div>
+        <div class="footer__bottom">
+            <div class="container">
+                <p>&copy; 2026 TechStore. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+    <script src="js/produtos.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/cep.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
