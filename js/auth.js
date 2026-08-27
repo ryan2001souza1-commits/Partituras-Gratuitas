@@ -19,6 +19,14 @@ const USERS_KEY = 'techstore_users';
 const CURRENT_KEY = 'techstore_currentUser';
 const RESET_KEY = 'techstore_reset';
 
+// ADMIN DEMO — APENAS PROTÓTIPO FRONT-END, NÃO É SEGURO PARA PRODUÇÃO
+// Em produção use backend, hash com salt, sessões seguras, HTTPS e RBAC no servidor.
+// Credenciais de demonstração (não exibir na UI pública):
+//   admin@techstore.com / TechStore@Admin2026
+// Hash SHA-256 da senha demonstrativa (não armazene senha em texto puro):
+const ADMIN_EMAIL = 'admin@techstore.com';
+const ADMIN_HASH = 'bcee2a0ca08e57a9e79114c9b3a09ac34d57774e4cb2e3e161c3d55deeffc63f';
+
 // ---------- Utilidades base ----------
 
 function validarEmail(email) {
@@ -99,14 +107,61 @@ function getCurrentUser() {
 }
 
 function setCurrentUser(user) {
-    // armazena apenas dados não sensíveis
-    const safe = { id: user.id, nome: user.nome, email: user.email };
+    // armazena apenas dados não sensíveis + tipo de sessão
+    const safe = {
+        id: user.id,
+        nome: user.nome,
+        email: user.email,
+        tipo: user.tipo || 'cliente',
+        autenticado: true
+    };
     localStorage.setItem(CURRENT_KEY, JSON.stringify(safe));
 }
 
 function logout() {
     localStorage.removeItem(CURRENT_KEY);
     // não apaga usuários nem reset token aqui; reset é invalidado só em redefinirSenha
+}
+
+function isAdmin() {
+    const u = getCurrentUser();
+    return !!(u && u.autenticado && u.tipo === 'admin');
+}
+
+function protegerPaginaAdmin() {
+    if (!isAdmin()) {
+        const inAdmin = window.location.pathname.includes('/admin');
+        // redireciona para login.html (relativo ao nível admin)
+        window.location.href = inAdmin ? '../login.html' : 'login.html';
+        return false;
+    }
+    return true;
+}
+
+// Wrapper login() para compatibilidade com spec (diferencia cliente/admin)
+async function login(email, senha) {
+    const normalized = (email || '').trim().toLowerCase();
+    // tenta admin primeiro (não está em techstore_users)
+    if (normalized === ADMIN_EMAIL) {
+        const h = await hashSenha(senha);
+        if (h === ADMIN_HASH) {
+            const adminUser = { id: 'admin', nome: 'Administrador', email: ADMIN_EMAIL, tipo: 'admin' };
+            setCurrentUser(adminUser);
+            return { ok: true, user: adminUser, isAdmin: true };
+        }
+        return { ok: false, erro: 'Senha incorreta.' };
+    }
+    // cliente normal
+    const res = await fazerLogin(email, senha);
+    if (res.ok) {
+        // garante tipo cliente
+        const u = getCurrentUser();
+        if (u && !u.tipo) {
+            u.tipo = 'cliente';
+            localStorage.setItem(CURRENT_KEY, JSON.stringify(u));
+        }
+    }
+    return res;
 }
 
 // ---------- Reset token (demo) ----------
@@ -317,6 +372,9 @@ async function handleCadastro(e) {
     } else if (!validarEmail(email.trim())) {
         showFieldError('erro-email', 'E-mail inválido. Ex: voce@exemplo.com');
         hasError = true;
+    } else if (email.trim().toLowerCase() === ADMIN_EMAIL) {
+        showFieldError('erro-email', 'Este e-mail é reservado.');
+        hasError = true;
     } else if (buscarUsuario(email)) {
         showFieldError('erro-email', 'Este e-mail já está cadastrado. Tente fazer login.');
         hasError = true;
@@ -394,9 +452,8 @@ async function handleLogin(e) {
 
     setLoading('btn-login', true);
     try {
-        const res = await fazerLogin(email, senha);
+        const res = await login(email, senha);
         if (!res.ok) {
-            // mensagem amigável mapeada por tipo
             if (res.erro.includes('não cadastrado')) {
                 showFieldError('erro-email', res.erro);
             } else if (res.erro.includes('Senha')) {
@@ -411,10 +468,14 @@ async function handleLogin(e) {
         } else {
             try { localStorage.removeItem('techstore_remember_email'); } catch {}
         }
-        showFeedback(`Bem-vindo, ${res.user.nome.split(' ')[0]}! Redirecionando...`, 'success');
-        setTimeout(() => {
-            window.location.href = 'index.html';
-        }, 900);
+        const primeiro = res.user.nome.split(' ')[0];
+        if (res.isAdmin || isAdmin()) {
+            showFeedback(`Bem-vindo, Administrador! Redirecionando ao painel...`, 'success');
+            setTimeout(() => { window.location.href = 'admin/index.html'; }, 900);
+        } else {
+            showFeedback(`Bem-vindo, ${primeiro}! Redirecionando...`, 'success');
+            setTimeout(() => { window.location.href = 'index.html'; }, 900);
+        }
     } finally {
         setLoading('btn-login', false);
     }
@@ -650,7 +711,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Expõe para integração com index.html/store
+// Expõe para integração com index.html/store e admin
+window.isAdmin = isAdmin;
+window.protegerPaginaAdmin = protegerPaginaAdmin;
+window.login = login;
 window.TechStoreAuth = {
     getCurrentUser,
     logout,
@@ -659,6 +723,9 @@ window.TechStoreAuth = {
     validarSenha,
     hashSenha,
     fazerLogin,
+    login,
+    isAdmin,
+    protegerPaginaAdmin,
     gerarToken,
     validarToken,
     redefinirSenha

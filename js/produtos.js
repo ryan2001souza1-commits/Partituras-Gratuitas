@@ -223,3 +223,28 @@ const produtos = [
         especificacoes: ["Portas: HDMI 4K + 3x USB 3.0 + SD/TF + PD", "Material: alumínio", "Compat.: MacBook, Dell, Lenovo", "PD: 100W", "Garantia: 12 meses"]
     }
 ];
+
+// Normalização + override via localStorage (ETAPA 3/4 - admin)
+// Garante campos estoque/ativo e reflete alterações do painel no catálogo público
+(function(){
+    function estoqueDefault(p){ const id=Number(p.id)||0; if(id%7===0) return 0; if(id%5===0) return 4; if(id%3===0) return 8; return 22; }
+    produtos.forEach(p=>{
+        if(typeof p.estoque !== 'number') p.estoque = estoqueDefault(p);
+        if(typeof p.ativo !== 'boolean') p.ativo = true;
+    });
+    try{
+        const raw = localStorage.getItem('techstore_produtos_admin');
+        if(raw){
+            const arr = JSON.parse(raw);
+            if(Array.isArray(arr) && arr.length){
+                const norm = arr.map(p=> ({
+                    ...p,
+                    estoque: typeof p.estoque === 'number' ? p.estoque : estoqueDefault(p),
+                    ativo: typeof p.ativo === 'boolean' ? p.ativo : true
+                }));
+                produtos.length = 0;
+                norm.forEach(p=> produtos.push(p));
+            }
+        }
+    }catch{}
+})();

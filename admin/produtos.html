@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos | Admin TechStore</title>
+    <meta name="robots" content="noindex">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="../js/auth.js"></script>
+    <script>if(typeof isAdmin==='function' && !isAdmin()) window.location.replace('../login.html');</script>
+</head>
+<body class="admin">
+    <div class="admin-layout">
+        <aside class="admin-sidebar" id="admin-sidebar">
+            <div class="admin-sidebar__header">
+                <a href="index.html" class="admin-logo">Tech<span>Store</span></a>
+                <span class="admin-badge">Admin</span>
+            </div>
+            <nav class="admin-nav">
+                <div class="admin-nav__label">Principal</div>
+                <a href="index.html" class="admin-nav__link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
+                <a href="produtos.html" class="admin-nav__link active" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>Produtos</a>
+                <a href="pedidos.html" class="admin-nav__link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M16 21h-8a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z"/><polyline points="8 11 12 15 16 11"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Pedidos</a>
+                <a href="configuracoes.html" class="admin-nav__link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 9 15a1.65 1.65 0 0 0-1-1.51H8a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1-1.51 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 13.4 3.4a1.65 1.65 0 0 0 1 1.51V5a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1 1.51H20a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1 1.51z"/></svg>Configurações</a>
+                <div class="admin-nav__label">Loja</div>
+                <a href="../index.html" class="admin-nav__link"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Ver loja</a>
+                <a href="#" class="admin-nav__link" id="admin-logout-mobile"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair</a>
+            </nav>
+            <div class="admin-sidebar__footer">
+                <div class="admin-user">
+                    <div class="admin-user__avatar">A</div>
+                    <div class="admin-user__info">
+                        <div class="admin-user__name" id="admin-user-nome">Administrador</div>
+                        <div class="admin-user__email" id="admin-user-email">admin@techstore.com</div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn--primary" id="admin-logout" style="width:100%; justify-content:center; border-radius:10px; padding:10px">Sair do painel</button>
+            </div>
+        </aside>
+        <div class="admin-overlay" id="admin-overlay"></div>
+
+        <div class="admin-main">
+            <header class="admin-topbar">
+                <div>
+                    <h1 class="admin-topbar__title">Produtos</h1>
+                    <p class="admin-topbar__subtitle"><span id="prod-count">0</span> produtos cadastrados</p>
+                </div>
+                <div style="display:flex; gap:10px; align-items:center">
+                    <button class="admin-menu-btn" id="admin-menu-btn" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+                    <button class="btn btn--primary" id="btn-add-produto">+ Adicionar produto</button>
+                </div>
+            </header>
+
+            <main class="admin-content">
+                <div class="admin-toolbar">
+                    <div class="admin-toolbar__search">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="search" id="prod-busca" placeholder="Buscar por nome ou categoria...">
+                    </div>
+                    <div style="font-size:.85rem; color:var(--text-muted)" id="prod-stats"></div>
+                </div>
+
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th style="width:60px">Imagem</th>
+                                <th>Nome</th>
+                                <th>Categoria</th>
+                                <th>Preço</th>
+                                <th>Estoque</th>
+                                <th>Status</th>
+                                <th style="width:200px">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="produtos-tbody">
+                            <tr><td colspan="7" style="text-align:center; padding:24px; color:var(--text-muted)">Carregando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Produto -->
+    <div class="admin-modal" id="produto-modal" aria-hidden="true">
+        <div class="admin-modal__overlay" id="produto-overlay"></div>
+        <div class="admin-modal__content">
+            <div class="admin-modal__header">
+                <h2 class="admin-modal__title" id="produto-modal-title">Adicionar produto</h2>
+                <button type="button" class="admin-modal__close" id="produto-close" aria-label="Fechar">&times;</button>
+            </div>
+            <form id="produto-form" class="admin-form" novalidate>
+                <input type="hidden" id="prod-id">
+                <div class="admin-form__grid">
+                    <div class="admin-form__field admin-form__field--full">
+                        <label for="prod-nome">Nome *</label>
+                        <input type="text" id="prod-nome" required placeholder="Ex: iPhone 15 Pro">
+                    </div>
+                    <div class="admin-form__field">
+                        <label for="prod-categoria">Categoria *</label>
+                        <select id="prod-categoria" required>
+                            <option value="">Selecione</option>
+                            <option>Smartphones</option>
+                            <option>Notebooks</option>
+                            <option>Computadores</option>
+                            <option>Processadores</option>
+                            <option>Placas de vídeo</option>
+                            <option>Memórias RAM</option>
+                            <option>SSDs</option>
+                            <option>Monitores</option>
+                            <option>Teclados</option>
+                            <option>Mouses</option>
+                            <option>Headsets</option>
+                            <option>Acessórios</option>
+                        </select>
+                    </div>
+                    <div class="admin-form__field">
+                        <label for="prod-preco">Preço (R$) *</label>
+                        <input type="number" id="prod-preco" step="0.01" min="0" required placeholder="1999.90">
+                    </div>
+                    <div class="admin-form__field">
+                        <label for="prod-preco-antigo">Preço antigo (R$)</label>
+                        <input type="number" id="prod-preco-antigo" step="0.01" min="0" placeholder="2499.90">
+                    </div>
+                    <div class="admin-form__field">
+                        <label for="prod-desconto">Desconto (%)</label>
+                        <input type="number" id="prod-desconto" min="0" max="90" placeholder="10">
+                    </div>
+                    <div class="admin-form__field">
+                        <label for="prod-estoque">Estoque *</label>
+                        <input type="number" id="prod-estoque" min="0" step="1" required placeholder="15">
+                    </div>
+                    <div class="admin-form__field admin-form__field--full">
+                        <label for="prod-imagem">Imagem (URL)</label>
+                        <input type="url" id="prod-imagem" placeholder="https://placehold.co/400x300...">
+                    </div>
+                    <div class="admin-form__field admin-form__field--full">
+                        <label for="prod-descricao">Descrição</label>
+                        <textarea id="prod-descricao" placeholder="Descrição do produto..."></textarea>
+                    </div>
+                    <div class="admin-form__field admin-form__field--full">
+                        <label for="prod-especs">Especificações (uma por linha)</label>
+                        <textarea id="prod-especs" placeholder="Tela: 6.7 polegadas&#10;Chip: A17 Pro&#10;RAM: 8GB"></textarea>
+                    </div>
+                    <div class="admin-form__field">
+                        <label class="admin-form__check"><input type="checkbox" id="prod-ativo" checked> Produto ativo</label>
+                    </div>
+                </div>
+                <div class="admin-form__actions">
+                    <button type="button" class="btn btn--ghost" id="produto-cancel">Cancelar</button>
+                    <button type="submit" class="btn btn--primary" id="produto-salvar">Salvar produto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirm Excluir -->
+    <div class="admin-modal" id="confirm-modal" aria-hidden="true">
+        <div class="admin-modal__overlay" id="confirm-overlay"></div>
+        <div class="admin-modal__content" style="max-width:420px">
+            <div class="admin-confirm">
+                <div style="font-size:2rem">⚠️</div>
+                <h3 style="font-weight:800; margin-top:8px">Tem certeza que deseja excluir este produto?</h3>
+                <p id="confirm-nome" style="font-weight:700"></p>
+                <p>Esta ação não pode ser desfeita.</p>
+                <div class="admin-confirm__actions">
+                    <button type="button" class="btn btn--ghost" id="confirm-cancel">Cancelar</button>
+                    <button type="button" class="btn btn--primary" id="confirm-excluir" style="background:var(--danger); border-color:var(--danger)">Excluir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+    <script src="../js/produtos.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

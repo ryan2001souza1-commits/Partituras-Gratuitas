@@ -38,16 +38,24 @@ function atualizarContadorCarrinho() {
 function adicionarAoCarrinho(id, quantidade = 1) {
     const produto = produtos.find(p => p.id === id);
     if (!produto) return;
+    if (produto.ativo === false) { mostrarToast('Produto desativado', 'error'); return; }
+    const estoque = typeof produto.estoque === 'number' ? produto.estoque : 22;
+    if (estoque === 0) { mostrarToast('Produto sem estoque', 'error'); return; }
     const carrinho = getCarrinho();
     const item = carrinho.find(i => i.id === id);
     const qtd = Math.max(1, parseInt(quantidade) || 1);
+    const jaNoCarrinho = item ? item.quantidade : 0;
+    if (estoque !== 0 && jaNoCarrinho + qtd > estoque) {
+        mostrarToast(`Estoque insuficiente. Disponível: ${estoque}`, 'error');
+        return;
+    }
     if (item) item.quantidade += qtd;
     else carrinho.push({ id: produto.id, nome: produto.nome, preco: produto.preco, imagem: produto.imagem, quantidade: qtd });
     salvarCarrinho(carrinho);
     mostrarToast(`${qtd}× ${produto.nome} adicionado ao carrinho!`);
 }
 
-// Cria HTML do card - reutilizável
+// Cria HTML do card - reutilizável (respeita estoque/ativo do admin)
 function criarCardProduto(produto) {
     const parcelado = (produto.preco / 12).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     const descontoHTML = produto.desconto ? `<span class="card__discount">-${produto.desconto}%</span>` : '';
@@ -55,8 +63,21 @@ function criarCardProduto(produto) {
     const imagemHTML = produto.imagem
         ? `<img src="${produto.imagem}" alt="${produto.nome}" class="card__image" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'">`
         : '';
+    const estoque = typeof produto.estoque === 'number' ? produto.estoque : 22;
+    const ativo = produto.ativo !== false;
+    let acaoHTML = `<button class="btn btn--primary btn--sm" onclick="adicionarAoCarrinho(${produto.id})">Adicionar</button>`;
+    let estoqueBadge = '';
+    if (!ativo) {
+        acaoHTML = `<button class="btn btn--primary btn--sm" disabled style="background:#94a3b8; border-color:#94a3b8; cursor:not-allowed">Inativo</button>`;
+        estoqueBadge = `<span style="font-size:.75rem; color:#64748b; font-weight:700; background:#f1f5f9; padding:3px 8px; border-radius:999px; border:1px solid var(--border)">Inativo</span>`;
+    } else if (estoque === 0) {
+        acaoHTML = `<button class="btn btn--primary btn--sm" disabled style="background:#94a3b8; border-color:#94a3b8; cursor:not-allowed">Sem estoque</button>`;
+        estoqueBadge = `<span style="font-size:.75rem; color:#dc2626; font-weight:700; background:#fee2e2; padding:3px 8px; border-radius:999px; border:1px solid #fecaca">Sem estoque</span>`;
+    } else if (estoque <= 10) {
+        estoqueBadge = `<span style="font-size:.75rem; color:#92400e; font-weight:700; background:#fef3c7; padding:3px 8px; border-radius:999px; border:1px solid #fde68a">Estoque baixo: ${estoque}</span>`;
+    }
     return `
-        <article class="card">
+        <article class="card" ${!ativo ? 'style="opacity:.72"' : ''}>
             <div class="card__image-wrap">
                 ${descontoHTML}
                 <span class="card__category">${produto.categoria}</span>
@@ -70,8 +91,9 @@ function criarCardProduto(produto) {
                     ${precoAntigoHTML}
                 </div>
                 <span class="card__installment">12x de <strong>${parcelado}</strong> sem juros</span>
+                ${estoqueBadge ? `<div style="margin-top:4px">${estoqueBadge}</div>` : ''}
                 <div class="card__actions">
-                    <button class="btn btn--primary btn--sm" onclick="adicionarAoCarrinho(${produto.id})">Adicionar</button>
+                    ${acaoHTML}
                     <a href="produto.html?id=${produto.id}" class="btn btn--ghost btn--sm">Ver</a>
                 </div>
             </div>
@@ -262,11 +284,19 @@ function configurarProdutoPage() {
     const precoAntigoHTML = produto.precoAntigo > produto.preco ? `<span class="produto__preco-antigo">${formatarPreco(produto.precoAntigo)}</span>` : '';
     const economia = produto.precoAntigo > produto.preco ? formatarPreco(produto.precoAntigo - produto.preco) : '';
     const especificacoesHTML = produto.especificacoes.map(e => `<li>${e}</li>`).join('');
+    const estoque = typeof produto.estoque === 'number' ? produto.estoque : 22;
+    const ativo = produto.ativo !== false;
+    let estoqueHTML = '';
+    if (!ativo) estoqueHTML = `<div style="margin:12px 0; padding:10px 14px; background:#fee2e2; border:1px solid #fecaca; color:#991b1b; border-radius:10px; font-weight:700; font-size:.9rem">Produto desativado</div>`;
+    else if (estoque === 0) estoqueHTML = `<div style="margin:12px 0; padding:10px 14px; background:#fee2e2; border:1px solid #fecaca; color:#991b1b; border-radius:10px; font-weight:700; font-size:.9rem">Sem estoque</div>`;
+    else if (estoque <= 10) estoqueHTML = `<div style="margin:12px 0; padding:10px 14px; background:#fef3c7; border:1px solid #fde68a; color:#92400e; border-radius:10px; font-weight:700; font-size:.9rem">Estoque baixo: apenas ${estoque} unidades</div>`;
+    else estoqueHTML = `<div style="margin:12px 0; font-size:.85rem; color:var(--success); font-weight:700">✓ Em estoque • Pronta entrega</div>`;
 
     container.innerHTML = `
         <div class="produto-detalhe">
             <div class="produto__imagem-wrap">
                 ${descontoBadge}
+                ${!ativo ? '<span style="position:absolute; top:16px; right:16px; background:#64748b; color:#fff; padding:6px 10px; border-radius:999px; font-weight:800; font-size:.82rem">Inativo</span>' : (estoque===0 ? '<span style="position:absolute; top:16px; right:16px; background:#dc2626; color:#fff; padding:6px 10px; border-radius:999px; font-weight:800; font-size:.82rem">Sem estoque</span>' : '')}
                 <img src="${produto.imagem}" alt="${produto.nome}" onerror="this.style.display='none'">
             </div>
             <div class="produto__info">
@@ -278,6 +308,7 @@ function configurarProdutoPage() {
                 </div>
                 ${economia ? `<span class="produto__desconto">Economize ${economia} (${produto.desconto}% OFF)</span>` : ''}
                 <p class="produto__parcelamento">12x de <strong>${parcelado}</strong> sem juros no cartão<br><span style="font-size:.85rem">ou ${formatarPreco(produto.preco * 0.9)} no PIX (10% OFF)</span></p>
+                ${estoqueHTML}
                 <p class="produto__descricao">${produto.descricao}</p>
 
                 <div class="produto__acoes">
@@ -286,7 +317,7 @@ function configurarProdutoPage() {
                         <span id="qtd-valor">1</span>
                         <button type="button" id="qtd-mais" aria-label="Aumentar">+</button>
                     </div>
-                    <button class="btn btn--primary" id="btn-add-produto" style="flex:1">Adicionar ao carrinho</button>
+                    <button class="btn btn--primary" id="btn-add-produto" style="flex:1" ${!ativo || estoque===0 ? 'disabled' : ''}>${!ativo ? 'Inativo' : estoque===0 ? 'Sem estoque' : 'Adicionar ao carrinho'}</button>
                 </div>
                 <a href="carrinho.html" style="display:inline-block; margin-top:10px; font-size:.9rem; color:var(--primary); text-decoration:none; font-weight:600">Ver carrinho →</a>
 
@@ -298,16 +329,25 @@ function configurarProdutoPage() {
         </div>
     `;
 
-    // Qtd handlers
+    // Qtd handlers (respeita estoque)
     let qtd = 1;
     const qtdValor = document.getElementById('qtd-valor');
-    document.getElementById('qtd-menos').addEventListener('click', () => {
-        if (qtd > 1) { qtd--; qtdValor.textContent = qtd; }
+    const estoqueLimite = typeof produto.estoque === 'number' ? produto.estoque : 22;
+    const ativoProd = produto.ativo !== false;
+    if (!ativoProd || estoqueLimite === 0) {
+        const menos = document.getElementById('qtd-menos');
+        const mais = document.getElementById('qtd-mais');
+        if (menos) menos.disabled = true;
+        if (mais) mais.disabled = true;
+    }
+    document.getElementById('qtd-menos')?.addEventListener('click', () => {
+        if (qtd > 1) { qtd--; if(qtdValor) qtdValor.textContent = qtd; }
     });
-    document.getElementById('qtd-mais').addEventListener('click', () => {
-        qtd++; qtdValor.textContent = qtd;
+    document.getElementById('qtd-mais')?.addEventListener('click', () => {
+        if (estoqueLimite !== 0 && qtd >= estoqueLimite) { mostrarToast(`Estoque máximo: ${estoqueLimite}`, 'error'); return; }
+        qtd++; if(qtdValor) qtdValor.textContent = qtd;
     });
-    document.getElementById('btn-add-produto').addEventListener('click', () => {
+    document.getElementById('btn-add-produto')?.addEventListener('click', () => {
         adicionarAoCarrinho(produto.id, qtd);
     });
 }
@@ -425,11 +465,143 @@ function configurarUI() {
     }
 }
 
+// Sync catálogo com admin (ETAPA 4) — reflete edições sem recarregar manualmente
+function recarregarProdutosDoAdmin() {
+    try {
+        const raw = localStorage.getItem('techstore_produtos_admin');
+        if (!raw) return false;
+        const arr = JSON.parse(raw);
+        if (!Array.isArray(arr) || !arr.length) return false;
+        // normaliza estoque/ativo caso admin antigo tenha salvo sem
+        const norm = arr.map(p=> ({
+            ...p,
+            estoque: typeof p.estoque === 'number' ? p.estoque : (Number(p.id)%7===0?0:Number(p.id)%5===0?4: Number(p.id)%3===0?8:22),
+            ativo: typeof p.ativo === 'boolean' ? p.ativo : true
+        }));
+        // evita loop se já idêntico
+        if (JSON.stringify(produtos) === JSON.stringify(norm)) return false;
+        produtos.length = 0;
+        norm.forEach(p=> produtos.push(p));
+        return true;
+    } catch { return false; }
+}
+const CONFIG_DEFAULT_FRONT = {
+    nome: 'TechStore',
+    telefone: '(11) 99999-0000',
+    email: 'contato@techstore.com.br',
+    fretePadrao: 19.90,
+    bannerTag: 'Ofertas da semana',
+    bannerTitulo: 'Tech que impulsiona você',
+    bannerDescricao: 'Até 40% OFF em notebooks, placas de vídeo e smartphones. Frete grátis para todo o Brasil.'
+};
+function getConfigFrontend() {
+    try {
+        const raw = localStorage.getItem('techstore_config');
+        if (raw) return { ...CONFIG_DEFAULT_FRONT, ...JSON.parse(raw) };
+    } catch {}
+    return { ...CONFIG_DEFAULT_FRONT };
+}
+function aplicarConfigNoFrontend() {
+    const cfg = getConfigFrontend();
+    // logo
+    document.querySelectorAll('.logo').forEach(el=>{
+        // preserva span se for TechStore, senão texto simples
+        if (cfg.nome.toLowerCase().includes('techstore')) {
+            el.innerHTML = 'Tech<span>Store</span>';
+            // se nome for diferente mas contém techstore, adapta
+            if (cfg.nome !== 'TechStore') {
+                // tenta manter estilo: primeira palavra + span resto
+                const partes = cfg.nome.split(' ');
+                if (partes.length >= 2) el.innerHTML = partes[0] + '<span>' + partes.slice(1).join(' ') + '</span>';
+                else el.textContent = cfg.nome;
+            }
+        } else {
+            el.textContent = cfg.nome;
+        }
+    });
+    const tag = document.querySelector('.banner__tag');
+    if (tag && cfg.bannerTag) tag.textContent = cfg.bannerTag;
+    const titulo = document.querySelector('.banner__text h1');
+    if (titulo && cfg.bannerTitulo) {
+        // preserva span no título se houver
+        if (cfg.bannerTitulo.includes('impulsiona')) {
+            titulo.innerHTML = 'Tech que <span>impulsiona</span> você';
+        } else {
+            titulo.textContent = cfg.bannerTitulo;
+        }
+        // fallback: usa texto puro se diferente
+        if (cfg.bannerTitulo !== CONFIG_DEFAULT_FRONT.bannerTitulo) titulo.textContent = cfg.bannerTitulo;
+    }
+    const desc = document.querySelector('.banner__text p');
+    if (desc && cfg.bannerDescricao) desc.textContent = cfg.bannerDescricao;
+    // footer contato - tenta achar pelo último .footer__col
+    const footerCols = document.querySelectorAll('.footer__col');
+    if (footerCols.length) {
+        const contatoCol = footerCols[footerCols.length - 1];
+        const p = contatoCol ? contatoCol.querySelector('p') : null;
+        if (p && (cfg.telefone || cfg.email)) {
+            // mantém formato: email<br>telefone<br>horário
+            const tel = cfg.telefone || CONFIG_DEFAULT_FRONT.telefone;
+            const email = cfg.email || CONFIG_DEFAULT_FRONT.email;
+            p.innerHTML = `${email}<br>${tel}<br>Seg a Sex 9h às 18h`;
+        }
+    }
+    // título da página
+    try {
+        if (cfg.nome && document.title && document.title.includes('TechStore')) {
+            document.title = document.title.replace('TechStore', cfg.nome);
+        }
+    } catch {}
+}
+
+function configurarSyncCatalogo() {
+    window.addEventListener('storage', (e)=>{
+        if (e.key === 'techstore_produtos_admin' || e.key === 'techstore_produtos') {
+            if (recarregarProdutosDoAdmin()) {
+                renderHome();
+                const grid = document.getElementById('produtos-grid');
+                if (grid) {
+                    if (typeof configurarProdutosPage === 'function') {
+                        const inp = document.getElementById('search-input');
+                        if (inp) inp.dispatchEvent(new Event('input', {bubbles:true}));
+                        else renderHome();
+                    }
+                }
+                const detalhe = document.getElementById('produto-detalhe');
+                if (detalhe) configurarProdutoPage();
+                if (typeof mostrarToast === 'function') mostrarToast('Catálogo atualizado', 'success');
+            }
+        }
+        if (e.key === 'techstore_config') {
+            aplicarConfigNoFrontend();
+            // recalcula frete se estiver no carrinho
+            if (typeof atualizarFreteECarrinho === 'function') atualizarFreteECarrinho();
+            else if (typeof renderCarrinho === 'function') renderCarrinho();
+        }
+    });
+    window.addEventListener('produtos:atualizado', ()=>{
+        if (recarregarProdutosDoAdmin()) {
+            renderHome();
+            configurarProdutoPage();
+            const inp = document.getElementById('search-input');
+            if (inp) inp.dispatchEvent(new Event('input', {bubbles:true}));
+        }
+    });
+    window.addEventListener('config:atualizado', ()=>{
+        aplicarConfigNoFrontend();
+        if (typeof atualizarFreteECarrinho === 'function') atualizarFreteECarrinho();
+        else if (typeof renderCarrinho === 'function') renderCarrinho();
+    });
+}
+
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
+    recarregarProdutosDoAdmin();
+    aplicarConfigNoFrontend();
     atualizarContadorCarrinho();
     configurarUI();
     atualizarHeaderAuth();
+    configurarSyncCatalogo();
     renderHome();
     configurarProdutosPage();
     configurarProdutoPage();

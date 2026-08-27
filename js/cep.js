@@ -137,18 +137,29 @@ async function calcularFrete(cep, produtos) {
         return { valor: 0, prazo: '3 a 6 dias úteis', nome: 'Frete padrão', gratuito: true };
     }
 
-    let base = 19.90;
-    // ajuste demonstrativo por estado (se endereço cacheado)
+    // base demonstrativa: usa frete padrão da config se definido, senão ajuste por UF
+    let base = null;
     try {
-        const end = obterEndereco();
-        if (end && end.estado) {
-            const uf = end.estado.toUpperCase();
-            if (['SP','RJ','MG','ES'].includes(uf)) base = 15.90;
-            else if (['RS','SC','PR'].includes(uf)) base = 22.90;
-            else if (['BA','PE','CE'].includes(uf)) base = 24.90;
-            else base = 27.90;
+        const cfgRaw = localStorage.getItem('techstore_config');
+        if (cfgRaw) {
+            const cfg = JSON.parse(cfgRaw);
+            const f = parseFloat(cfg.fretePadrao);
+            if (Number.isFinite(f) && f >= 0) base = Math.round(f * 100) / 100;
         }
     } catch {}
+    if (base == null) {
+        base = 19.90;
+        try {
+            const end = obterEndereco();
+            if (end && end.estado) {
+                const uf = end.estado.toUpperCase();
+                if (['SP','RJ','MG','ES'].includes(uf)) base = 15.90;
+                else if (['RS','SC','PR'].includes(uf)) base = 22.90;
+                else if (['BA','PE','CE'].includes(uf)) base = 24.90;
+                else base = 27.90;
+            }
+        } catch {}
+    }
 
     const extra = Math.max(0, qtd - 1) * 1.50;
     const valor = Math.round((base + extra) * 100) / 100;
